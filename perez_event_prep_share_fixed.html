@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f4e78">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Perez Event Prep">
+<title>Perez Event Prep</title>
+<style>
+:root {
+  --blue:#1f4e78; --blue2:#17365d; --bg:#f4f7fb; --card:#fff; --line:#d8e1ea;
+  --text:#1f2933; --muted:#667085; --green:#35b653; --green-bg:#d9ead3;
+  --yellow:#fff2cc; --red:#fce4d6;
+}
+* { box-sizing:border-box; }
+body { margin:0; font-family:Arial,sans-serif; background:var(--bg); color:var(--text); padding:14px; -webkit-text-size-adjust:100%; }
+.container { max-width:1200px; margin:auto; }
+.header { position:sticky; top:0; z-index:5; background:linear-gradient(135deg,var(--blue),var(--blue2)); color:#fff; padding:18px 16px; border-radius:18px; box-shadow:0 4px 14px rgba(0,0,0,.16); margin-bottom:14px; }
+h1 { font-size:22px; line-height:1.15; margin:0 0 6px; }
+.subtitle { font-size:14px; opacity:.9; margin:0; }
+.progress-wrap { margin-top:14px; }
+.progress-label { display:flex; justify-content:space-between; align-items:center; font-size:13px; font-weight:bold; margin-bottom:6px; }
+.progress-track { width:100%; height:16px; background:rgba(255,255,255,.22); border:1px solid rgba(255,255,255,.28); border-radius:999px; overflow:hidden; }
+.progress-fill { width:0%; height:100%; background:var(--green); border-radius:999px; transition:width .25s ease; }
+.summary { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:14px; }
+.stat { background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.2); border-radius:12px; padding:8px; text-align:center; color:#fff; font-size:13px; }
+.stat strong { display:block; font-size:18px; }
+.stat-button { width:100%; font-family:Arial,sans-serif; cursor:pointer; }
+.actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:12px 0 14px; }
+button { border:0; background:var(--blue); color:#fff; border-radius:12px; padding:12px 10px; font-size:15px; font-weight:bold; cursor:pointer; }
+button.secondary { background:#475467; }
+button.danger { background:#9c0006; }
+.add-panel, .card, .table-screen { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:15px; margin-bottom:14px; box-shadow:0 3px 10px rgba(0,0,0,.07); }
+.add-panel h2, .table-header h2 { margin:0 0 12px; color:var(--blue); font-size:18px; }
+.form-grid { display:grid; grid-template-columns:1fr; gap:10px; }
+label { font-size:13px; font-weight:bold; color:#344054; }
+input, textarea, select { display:block; width:100%; margin-top:5px; padding:12px; font-size:16px; border-radius:12px; border:1px solid #b9c4d0; background:#fff; font-family:Arial,sans-serif; }
+textarea { min-height:78px; resize:vertical; }
+.card-top { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; }
+.task-number { color:var(--muted); font-weight:bold; font-size:13px; }
+.priority { border-radius:999px; padding:5px 10px; font-weight:bold; font-size:12px; }
+.priority.high { background:var(--red); color:#9c0006; }
+.priority.medium { background:var(--yellow); color:#7f6000; }
+.area { color:var(--blue); font-weight:bold; font-size:13px; margin-bottom:5px; }
+.card h2 { font-size:18px; margin:0 0 7px; line-height:1.25; color:var(--text); }
+.card p { font-size:14px; color:#475467; margin:0 0 12px; line-height:1.4; }
+.controls { display:grid; grid-template-columns:1fr; gap:10px; }
+.status-select.completed { background:var(--green-bg); border-color:#70ad47; }
+.status-select.started { background:var(--yellow); border-color:#bf9000; }
+.status-select.not-started { background:#f2f4f7; }
+.delete-row { margin-top:10px; width:100%; background:#9c0006; display:none; }
+.card.custom .delete-row { display:block; }
+.screen-hidden { display:none !important; }
+.table-header { display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; }
+.table-header h2 { margin:0; }
+.back-button { background:#475467; width:auto; padding:10px 14px; }
+.table-scroll { overflow-x:auto; border:1px solid var(--line); border-radius:12px; }
+.quick-table { width:100%; border-collapse:collapse; min-width:660px; }
+.quick-table th { background:var(--blue); color:#fff; padding:10px; text-align:left; font-size:13px; }
+.quick-table td { padding:9px; border-bottom:1px solid var(--line); font-size:13px; vertical-align:top; }
+.quick-table tr:nth-child(even) { background:#fbfbfb; }
+.footer { color:#667085; text-align:center; font-size:12px; padding:14px 4px 24px; }
+.toast { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); background:#17365d; color:#fff; padding:10px 14px; border-radius:999px; font-size:14px; opacity:0; pointer-events:none; transition:.25s; z-index:10; }
+.toast.show { opacity:1; }
+@media (min-width:780px) {
+  body { padding:20px; }
+  .form-grid { grid-template-columns:1fr 1fr; }
+  .form-grid .wide { grid-column:1 / -1; }
+  .cards { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+  .card { margin-bottom:0; }
+  .controls { grid-template-columns:1fr 1fr; }
+}
+@media print {
+  body { background:#fff; padding:0; }
+  .header,.actions,.add-panel,.footer,.toast,.delete-row { display:none; }
+  .card { break-inside:avoid; box-shadow:none; border:1px solid #ccc; margin-bottom:8px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+<header class="header">
+  <h1>Perez Event Prep</h1>
+  <p class="subtitle">Full property reset, assignments, live progress tracking, and add-task control.</p>
+  <div class="progress-wrap">
+    <div class="progress-label"><span>Overall Completion</span><strong id="completionPercent">0%</strong></div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+  <div class="summary">
+    <button class="stat stat-button" onclick="showTableScreen()" type="button"><strong id="totalCount">0</strong>Total</button>
+    <div class="stat"><strong id="startedCount">0</strong>Started</div>
+    <div class="stat"><strong id="completedCount">0</strong>Done</div>
+  </div>
+</header>
+
+<div class="actions">
+  <button onclick="window.print()">Print / PDF</button>
+  <button class="secondary" onclick="resetStatuses()">Reset Status</button>
+</div>
+
+<div id="mainScreen">
+  <section class="add-panel">
+    <h2>Add New Task</h2>
+    <div class="form-grid">
+      <label>Area <input id="newArea" placeholder="Example: Upstairs Hallway"></label>
+      <label>Task <input id="newTask" placeholder="Example: Touch up trim paint"></label>
+      <label class="wide">Details <textarea id="newDetails" placeholder="Add notes, materials, or instructions"></textarea></label>
+      <label>Priority <select id="newPriority"><option>High</option><option>Medium</option></select></label>
+      <label>Assigned <select id="newAssigned"><option>Unassigned</option><option>Gabriel</option><option>Nick</option><option>Nico</option><option>Isaac</option><option>Anna</option></select></label>
+    </div>
+    <button style="width:100%; margin-top:12px;" onclick="addTask()">Add Task</button>
+  </section>
+  <main class="cards" id="cards"></main>
+</div>
+
+<section id="tableScreen" class="table-screen screen-hidden">
+  <div class="table-header">
+    <h2>All Tasks Table</h2>
+    <button class="back-button" onclick="showMainScreen()" type="button">Back</button>
+  </div>
+  <div class="table-scroll">
+    <table class="quick-table">
+      <thead><tr><th>#</th><th>Area</th><th>Task</th><th>Priority</th><th>Status</th><th>Assigned</th></tr></thead>
+      <tbody id="quickTableBody"></tbody>
+    </table>
+  </div>
+</section>
+
+<div class="footer">Tap Total to see all tasks in a compact table. New tasks and dropdown selections save automatically in this browser.</div>
+</div>
+<div class="toast" id="toast">Saved</div>
+
+<script>
+const DEFAULT_TASKS = [{"area": "Exterior - Front Area", "task": "Trim front planter", "details": "Shape plants, remove dead growth, and clean surrounding area", "priority": "High", "id": 1, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Exterior - Front Area", "task": "Clean front light", "details": "Wipe fixture, remove cobwebs, and test bulb", "priority": "Medium", "id": 2, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Exterior - Front Area", "task": "Scrub front fence", "details": "Use mold and mildew detergent so the fence does not look black", "priority": "High", "id": 3, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Exterior - Front Area", "task": "Clean up planter", "details": "Weed, refresh soil surface, and tidy layout", "priority": "High", "id": 4, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Exterior - Entrance", "task": "Review two entrance planters", "details": "Check symmetry, health, trim, and clean planter containers", "priority": "High", "id": 5, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Exterior - Entrance", "task": "Adjust entrance planters", "details": "Replace weak plants and rebalance design if needed", "priority": "Medium", "id": 6, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Exterior - Walkway", "task": "Polish walkway plants", "details": "Trim edges, remove dead growth, and open the walkway", "priority": "High", "id": 7, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Exterior - Walkway", "task": "Thin ball grass", "details": "Remove selected clumps for spacing and cleaner symmetry", "priority": "Medium", "id": 8, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Exterior - Rock Areas", "task": "Weed all rocks", "details": "Pull weeds from the roots, especially along edges", "priority": "High", "id": 9, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Exterior - Rock Areas", "task": "Clean rocks", "details": "Remove debris, rinse, or lightly pressure wash", "priority": "High", "id": 10, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Exterior - Grass Edge", "task": "Water sidewalk patch of grass", "details": "Deep soak and check water coverage", "priority": "Medium", "id": 11, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Exterior - Main Area", "task": "Remove wood beams", "details": "Haul away beams, nails, and leftover debris", "priority": "High", "id": 12, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Exterior - Main Area", "task": "Rake under tree", "details": "Clear leaves, branches, and organic buildup", "priority": "High", "id": 13, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Exterior - Main Area", "task": "Fix exterior light", "details": "Repair or replace fixture, then test at night", "priority": "High", "id": 14, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Exterior - Garage Door", "task": "Touch up garage door paint", "details": "Sand, clean, color match, and apply thin coats", "priority": "High", "id": 15, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Exterior - Surfaces", "task": "Touch up small exterior stains", "details": "Spot clean walls, concrete, trim, or stained areas as needed", "priority": "Medium", "id": 16, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Interior - General", "task": "Clean left inside area", "details": "General deep clean and tidy-up", "priority": "Medium", "id": 17, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Interior - General", "task": "Clean baseboards", "details": "Deep clean along all baseboards, especially edges and corners", "priority": "High", "id": 18, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Interior - Ceilings", "task": "Clean all ceilings", "details": "Kitchen, living room, and main area ceilings need dust, cobweb, and buildup removal", "priority": "High", "id": 19, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Interior - HVAC", "task": "Clean air conditioning vents", "details": "Remove dust, wipe covers, and clean visible vent buildup throughout the house", "priority": "High", "id": 20, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Guest Bathroom", "task": "Clean light fixtures and cross", "details": "Dust, polish, and wipe down guest bathroom light fixtures and cross", "priority": "Medium", "id": 21, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Master Bathroom", "task": "Remove spiders from shower", "details": "Clean spiders and webs from the master bath shower, then sanitize", "priority": "High", "id": 22, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Kitchen", "task": "Wash cabinets", "details": "Degrease and wipe down cabinet fronts, handles, and visible edges", "priority": "High", "id": 23, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Kitchen", "task": "Clean range hood granite and vent", "details": "Scrub grease from granite hood area and clean the vent thoroughly", "priority": "High", "id": 24, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Kitchen", "task": "Repaint trash bin", "details": "Prep, repaint, and clean up the trash bin exterior", "priority": "Medium", "id": 25, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Kitchen", "task": "Repaint refrigerator door opening edges", "details": "Repair and repaint damaged edging on the double-door refrigerator opening side", "priority": "High", "id": 26, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Kitchen", "task": "Clean island pendant lights", "details": "Clean all three pendant lights above the island", "priority": "Medium", "id": 27, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Dining Room", "task": "Clean dining room lighting", "details": "Dust and polish dining room light fixture", "priority": "Medium", "id": 28, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Island Area", "task": "Touch up paint under island", "details": "Repair bar stool scrapes and damage, including baseboards under and around island", "priority": "High", "id": 29, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Living Room", "task": "Patch wall hole", "details": "Patch, sand, texture if needed, and repaint wall damage", "priority": "High", "id": 30, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Living Room", "task": "Remove electronics clutter", "details": "Clear out unused electronics from the entertainment area", "priority": "Medium", "id": 31, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Gym", "task": "Clean up gym", "details": "Organize equipment, wipe surfaces, remove clutter, and reset the room", "priority": "High", "id": 32, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Gym", "task": "Remove fish tank", "details": "Safely remove fish tank and clean the area where it was sitting", "priority": "High", "id": 33, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Garage", "task": "Retouch all garage paint", "details": "Patch, sand, and touch up paint throughout the garage where needed", "priority": "High", "id": 34, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Attic Upstairs", "task": "Clean and organize attic", "details": "Clean everything up, put items away, and organize storage areas", "priority": "High", "id": 35, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Attic Office", "task": "Clean upstairs attic office", "details": "Declutter office, wipe surfaces, organize paperwork/items, and reset workspace", "priority": "High", "id": 36, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Lizzie Bathroom", "task": "Replace damaged showerhead", "details": "Remove damaged showerhead and install replacement", "priority": "High", "id": 37, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Lizzie Door", "task": "Repair door jamb and lock hardware", "details": "Fix door jamb and adjust or replace hardware so the door locks properly", "priority": "High", "id": 38, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Lizzie Window", "task": "Fix window closing issue", "details": "Window is hard to close and does not close properly, inspect track, latch, and alignment", "priority": "High", "id": 39, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Lizzie Room", "task": "Touch up wall paint", "details": "Touch up paint where hanging items left marks or damaged spots", "priority": "Medium", "id": 40, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Lizzie Room", "task": "Finish painting AC vent", "details": "Complete painting on the air conditioning vent for a clean finish", "priority": "Medium", "id": 41, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Lizzie Closet", "task": "Install closet light switch cover", "details": "Add missing cover plate to closet light switch", "priority": "Medium", "id": 42, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Lizzie Bathroom", "task": "Replace rusty bathroom light", "details": "Remove rusty fixture and install new bathroom light", "priority": "High", "id": 43, "status": "Not Started", "assigned": "Unassigned", "custom": false}, {"area": "Primary Bedroom", "task": "Confirm bedroom scope", "details": "Final walkthrough to identify cleaning, touch-up, and organization items", "priority": "Medium", "id": 44, "status": "Not Started", "assigned": "Unassigned", "custom": false}];
+const STORAGE_KEY = "perez_event_prep_tasks_v4";
+
+function normalizeTask(t, index) {
+  return {
+    id: Number(t.id) || index + 1,
+    area: t.area || "General",
+    task: t.task || "Untitled task",
+    details: t.details || "",
+    priority: t.priority === "Medium" ? "Medium" : "High",
+    status: ["Not Started","Started","Completed"].includes(t.status) ? t.status : "Not Started",
+    assigned: ["Unassigned","Gabriel","Nick","Nico","Isaac","Anna"].includes(t.assigned) ? t.assigned : "Unassigned",
+    custom: Boolean(t.custom)
+  };
+}
+
+function getTasks() {
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch(e) { saved = null; }
+  if (!Array.isArray(saved) || saved.length < DEFAULT_TASKS.length) {
+    const repaired = DEFAULT_TASKS.map(normalizeTask);
+    if (Array.isArray(saved)) {
+      saved.forEach(s => {
+        const existing = repaired.find(t => t.id === s.id);
+        if (existing) {
+          existing.status = s.status || existing.status;
+          existing.assigned = s.assigned || existing.assigned;
+        } else if (s && s.custom) {
+          repaired.push(normalizeTask(s, repaired.length));
+        }
+      });
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(repaired));
+    return repaired;
+  }
+  return saved.map(normalizeTask);
+}
+
+function saveTasks(tasks) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks.map(normalizeTask)));
+}
+
+function escapeHtml(text) {
+  return String(text).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
+
+function optionList(options, selected) {
+  return options.map(o => `<option ${o === selected ? "selected" : ""}>${escapeHtml(o)}</option>`).join("");
+}
+
+function statusClass(status) {
+  if (status === "Completed") return "completed";
+  if (status === "Started") return "started";
+  return "not-started";
+}
+
+function render() {
+  const tasks = getTasks();
+  const cards = document.getElementById("cards");
+  cards.innerHTML = "";
+  tasks.forEach((t, index) => {
+    const card = document.createElement("article");
+    card.className = "card" + (t.custom ? " custom" : "");
+    card.innerHTML = `
+      <div class="card-top">
+        <span class="task-number">#${index + 1}</span>
+        <span class="priority ${t.priority === "High" ? "high" : "medium"}">${escapeHtml(t.priority)}</span>
+      </div>
+      <div class="area">${escapeHtml(t.area)}</div>
+      <h2>${escapeHtml(t.task)}</h2>
+      <p>${escapeHtml(t.details)}</p>
+      <div class="controls">
+        <label>Status
+          <select class="status-select ${statusClass(t.status)}" onchange="updateTask(${t.id}, 'status', this.value)">
+            ${optionList(["Not Started","Started","Completed"], t.status)}
+          </select>
+        </label>
+        <label>Assigned
+          <select onchange="updateTask(${t.id}, 'assigned', this.value)">
+            ${optionList(["Unassigned","Gabriel","Nick","Nico","Isaac","Anna"], t.assigned)}
+          </select>
+        </label>
+      </div>
+      <button class="delete-row danger" onclick="deleteTask(${t.id})">Delete Added Task</button>
+    `;
+    cards.appendChild(card);
+  });
+  updateCounts();
+}
+
+function renderQuickTable() {
+  const body = document.getElementById("quickTableBody");
+  const tasks = getTasks();
+  body.innerHTML = tasks.map((t, index) => `
+    <tr>
+      <td>${index + 1}</td>
+      <td>${escapeHtml(t.area)}</td>
+      <td>${escapeHtml(t.task)}</td>
+      <td>${escapeHtml(t.priority)}</td>
+      <td>${escapeHtml(t.status)}</td>
+      <td>${escapeHtml(t.assigned)}</td>
+    </tr>
+  `).join("");
+}
+
+function updateCounts() {
+  const tasks = getTasks();
+  const completed = tasks.filter(t => t.status === "Completed").length;
+  const started = tasks.filter(t => t.status === "Started").length;
+  const total = tasks.length;
+  const percent = total ? Math.round((completed / total) * 100) : 0;
+  document.getElementById("totalCount").textContent = total;
+  document.getElementById("startedCount").textContent = started;
+  document.getElementById("completedCount").textContent = completed;
+  document.getElementById("completionPercent").textContent = percent + "%";
+  document.getElementById("progressFill").style.width = percent + "%";
+  renderQuickTable();
+}
+
+function updateTask(id, field, value) {
+  const tasks = getTasks();
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  task[field] = value;
+  saveTasks(tasks);
+  render();
+  showToast("Saved");
+}
+
+function addTask() {
+  const area = document.getElementById("newArea").value.trim();
+  const task = document.getElementById("newTask").value.trim();
+  const details = document.getElementById("newDetails").value.trim();
+  const priority = document.getElementById("newPriority").value;
+  const assigned = document.getElementById("newAssigned").value;
+  if (!area || !task) { showToast("Area and task required"); return; }
+  const tasks = getTasks();
+  const maxId = tasks.reduce((max,t) => Math.max(max, Number(t.id) || 0), 0);
+  tasks.push({ id:maxId+1, area, task, details, priority, status:"Not Started", assigned, custom:true });
+  saveTasks(tasks);
+  document.getElementById("newArea").value = "";
+  document.getElementById("newTask").value = "";
+  document.getElementById("newDetails").value = "";
+  document.getElementById("newPriority").value = "High";
+  document.getElementById("newAssigned").value = "Unassigned";
+  render();
+  showToast("Task added");
+}
+
+function deleteTask(id) {
+  saveTasks(getTasks().filter(t => t.id !== id));
+  render();
+  showToast("Task deleted");
+}
+
+function resetStatuses() {
+  const tasks = getTasks().map(t => ({...t, status:"Not Started"}));
+  saveTasks(tasks);
+  render();
+  showToast("Statuses reset");
+}
+
+function showTableScreen() {
+  document.getElementById("mainScreen").classList.add("screen-hidden");
+  document.getElementById("tableScreen").classList.remove("screen-hidden");
+  renderQuickTable();
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function showMainScreen() {
+  document.getElementById("tableScreen").classList.add("screen-hidden");
+  document.getElementById("mainScreen").classList.remove("screen-hidden");
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+let toastTimer;
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove("show"), 1200);
+}
+
+document.addEventListener("DOMContentLoaded", render);
+</script>
+</body>
+</html>
